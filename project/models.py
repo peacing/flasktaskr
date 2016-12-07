@@ -1,6 +1,7 @@
 # project/models.py
 
 from views import db
+import datetime
 
 
 class Task(db.Model):
@@ -12,8 +13,10 @@ class Task(db.Model):
     due_date = db.Column(db.Date, nullable=False)
     priority = db.Column(db.Integer, nullable=False)
     status = db.Column(db.Integer)
+    posted_date = db.Column(db.Date, default=datetime.datetime.utcnow())
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-    def __init__(self, name, due_date, priority, status):
+    def __init__(self, name, due_date, priority, posted_date, status, user_id):
 
         self.name = name
         self.due_date = due_date
@@ -22,6 +25,25 @@ class Task(db.Model):
 
     def __repr__(self):
         return '<name {0}'.format(self.name)
+
+class User(db.Model):
+
+    __tablename__ = 'users'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, unique=True, nullable=False)
+    email = db.Column(db.String, unique=True, nullable=False)
+    password = db.Column(db.String, nullable=False)
+    tasks = db.Relationship('Task', backref='poster')
+
+    def __init__(self, name=None, email=None, password=None):
+
+        self.name = name
+        self.email = email
+        self.password = password
+
+        def __repr__(self):
+            return '<user {0}'.format(self.name)
 
 
 

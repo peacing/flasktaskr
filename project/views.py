@@ -1,8 +1,8 @@
 import sqlite3
 from functools import wraps
-
 from flask import Flask, flash, redirect, render_template, request, \
     session, url_for, g
+from forms import AddTaskForm
 
 # config
 app = Flask(__name__)
@@ -33,8 +33,8 @@ def logout():
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        if request.form['USERNAME'] != app.config['USERNAME'] \
-          or request.form['PASSWORD'] != app.config['PASSWORD']:
+        if request.form['username'] != app.config['USERNAME'] \
+          or request.form['password'] != app.config['PASSWORD']:
             error = 'Invalid Credentials. Please try again.'
             return render_template('login.html', error=error)
 
@@ -53,13 +53,13 @@ def tasks():
         'select name, due_date, priority, task_id from tasks where status=1'
     )
     open_tasks = [
-        dict(name=rop[0], due_date=row[1], priority=row[2], task_id=row[3] for row in cur.fetchall())
+        dict(name=row[0], due_date=row[1], priority=row[2], task_id=row[3]) for row in cur.fetchall()
     ]
     cur = g.db.execute(
         'select name, due_date, priority, task_id from tasks where status=0'
     )
     closed_tasks = [
-        dict(name=row[0], due_date=row[1], priority=row[2], task_id=row[3] for row in cur.fetchall())
+        dict(name=row[0], due_date=row[1], priority=row[2], task_id=row[3]) for row in cur.fetchall()
     ]
     g.db.close()
     return render_template(
@@ -76,7 +76,7 @@ def new_task():
     name = request.form['name']
     date = request.form['due_date']
     priority = request.form['priority']
-    if not anme or not date or not priority:
+    if not name or not date or not priority:
         flash("All field are required. Please try again.")
         return redirect(url_for('tasks'))
     else:

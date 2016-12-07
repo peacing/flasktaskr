@@ -21,7 +21,9 @@ class Task(db.Model):
         self.name = name
         self.due_date = due_date
         self.priority = priority
+        self.posted_date = posted_date
         self.status = status
+        self.user_id = user_id
 
     def __repr__(self):
         return '<name {0}'.format(self.name)
@@ -34,7 +36,7 @@ class User(db.Model):
     name = db.Column(db.String, unique=True, nullable=False)
     email = db.Column(db.String, unique=True, nullable=False)
     password = db.Column(db.String, nullable=False)
-    tasks = db.Relationship('Task', backref='poster')
+    tasks = db.relationship('Task', backref='poster')
 
     def __init__(self, name=None, email=None, password=None):
 
